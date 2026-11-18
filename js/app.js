@@ -24,7 +24,7 @@
     left: 0,            // en puntos
     right: 0,           // en puntos
     anchor: 'left',     // último margen fijado por el usuario (modo desplazar)
-    mode: 'shift',      // 'shift' | 'fit'
+    mode: 'fit',        // 'fit' (márgenes independientes) | 'shift' (mover bloque)
     vAnchor: 'top',
     reference: 'common',
     threshold: 240,
@@ -249,9 +249,13 @@
       html = `<strong>Sin pérdida de contenido.</strong><ul>${t.warnings.map((w) => `<li>${w}</li>`).join('')}</ul>`;
     } else {
       cls = 'status-ok';
-      html = t.identity
-        ? '<strong>Sin cambios.</strong> Ajuste los márgenes con los botones, el control deslizante o escribiendo el valor.'
-        : '<strong>✓ Todo el contenido queda dentro de la hoja</strong>, a su tamaño original (100 %).';
+      if (t.identity) {
+        html = '<strong>Sin cambios.</strong> Ajuste los márgenes con los botones, el control deslizante o escribiendo el valor.';
+      } else if (Math.abs(t.s - 1) > 1e-4) {
+        html = `<strong>✓ Todo el contenido queda dentro de la hoja.</strong><br>Tamaño del contenido: ${(t.s * 100).toFixed(1)} %, en la misma proporción a lo ancho y a lo alto, así que no se deforma.`;
+      } else {
+        html = '<strong>✓ Todo el contenido queda dentro de la hoja</strong>, a su tamaño original (100 %).';
+      }
     }
     el.status.className = 'status ' + cls;
     el.status.innerHTML = html;
@@ -504,7 +508,9 @@
     r.addEventListener('change', () => {
       state.mode = r.value;
       el.vAnchorRow.classList.toggle('hidden', state.mode !== 'fit');
-      el.linkHint.classList.toggle('hidden', state.mode !== 'shift');
+      el.linkHint.innerHTML = state.mode === 'fit'
+        ? 'Cada margen es independiente: al cambiar uno, el otro no se mueve. Si el espacio cambia, el contenido se ajusta en la misma proporción a lo ancho y a lo alto, sin deformarse.'
+        : 'En <strong>Mover el bloque</strong> el contenido conserva su tamaño exacto, por eso los dos márgenes están enlazados: si uno crece, el otro se reduce.';
       syncLinked();
       refreshControls();
       scheduleRender();

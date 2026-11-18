@@ -15,8 +15,9 @@ Desarrollado por **Prof Kenfor Euceda**.
 - Métricas en vivo: margen original → nuevo, ancho del contenido, desplazamiento, escala, márgenes superior e inferior.
 - Botón **Ver original** para comparar el antes y el después.
 - Dos modos:
-  - **Solo desplazar** (recomendado): el contenido se mueve sin cambiar de tamaño (100 %).
-  - **Fijar ambos márgenes**: escala **proporcional** (igual en ancho y alto) para lograr ambos márgenes exactos.
+  - **Márgenes independientes** (predeterminado): cada margen se ajusta por separado; al cambiar uno, el otro no se mueve.
+    El contenido se adapta con una escala **proporcional** (igual en ancho y alto), sin deformarse.
+  - **Mover el bloque (100 %)**: el contenido conserva su tamaño exacto y solo se desplaza; los márgenes quedan enlazados.
 - Aplicar **igual en todo el documento** o **según el contenido de cada página**.
 - Soporta páginas giradas y de distintos tamaños (Carta, Oficio, A4, etc.).
 - Todo se procesa **en el navegador**: el PDF nunca se sube a ningún servidor.
@@ -66,13 +67,13 @@ También puede abrir `index.html` directamente en el navegador (necesita Interne
 
 1. Pulse **Abrir PDF** o arrastre el archivo al visor.
 2. Ajuste el **margen izquierdo** y/o el **margen derecho**; la vista previa se actualiza al instante.
-3. Revise las **métricas** y el **estado** (verde = todo dentro de la hoja).
+3. Revise las **métricas** (incluida la escala del contenido) y el **estado** (verde = todo dentro de la hoja).
 4. Pulse **Descargar PDF ajustado**. Se descarga como `nombre_margenes.pdf`.
 
 ### Consejos
 
-- Para documentos con códigos de barras, use **Solo desplazar**: el tamaño queda al 100 %.
-- En modo **Fijar ambos márgenes**, si la reducción supera el 15 % la aplicación lo advierte para que verifique la lectura del código.
+- En **Márgenes independientes**, si el contenido se reduce más del 15 %, la aplicación lo advierte para que verifique la lectura de los códigos de barras.
+- Si necesita el contenido exactamente al 100 %, use **Mover el bloque**.
 - Si un elemento muy claro (marca de agua, fondo gris suave) no se detecta como contenido, suba la **sensibilidad de detección**.
 - Los PDF protegidos con contraseña deben desprotegerse antes de usarlos.
 

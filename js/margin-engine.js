@@ -73,14 +73,9 @@
       if (res.newBottom < -TOL) res.overflowSides.push('inferior');
       res.overflow = res.overflowSides.length > 0;
 
-      if (Math.abs(s - 1) > 1e-4) {
-        const pct = (s * 100).toFixed(1);
-        res.warnings.push(s < 1
-          ? `El contenido se reduce al ${pct} % (proporcional, sin deformar).`
-          : `El contenido se amplía al ${pct} % (proporcional, sin deformar).`);
-        if (s < 0.85) {
-          res.warnings.push('Reducción mayor al 15 %: verifique que los códigos de barras sigan leyéndose con su lector.');
-        }
+      if (s < 0.85) {
+        res.warnings.push(`El contenido se reduce al ${(s * 100).toFixed(1)} % (proporcional, sin deformar).`);
+        res.warnings.push('Reducción mayor al 15 %: verifique que los códigos de barras sigan leyéndose con su lector.');
       }
       return res;
     },

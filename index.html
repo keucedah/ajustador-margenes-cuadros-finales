@@ -84,7 +84,7 @@
           <input type="range" id="rightRange" min="0" max="100" step="0.1" disabled>
         </div>
 
-        <p class="hint" id="linkHint">En modo <strong>Solo desplazar</strong> los dos márgenes están enlazados: si uno crece, el otro se reduce, porque el contenido conserva su tamaño exacto.</p>
+        <p class="hint" id="linkHint">Cada margen es independiente: al cambiar uno, el otro no se mueve. Si el espacio cambia, el contenido se ajusta en la misma proporción a lo ancho y a lo alto, sin deformarse.</p>
 
         <div class="quick-actions">
           <button id="btnCenter" class="btn btn-ghost" disabled>Centrar contenido</button>
@@ -95,20 +95,20 @@
       <section class="card">
         <h2>Modo de ajuste</h2>
         <label class="radio">
-          <input type="radio" name="mode" value="shift" checked>
+          <input type="radio" name="mode" value="fit" checked>
           <span>
-            <strong>Solo desplazar (recomendado)</strong>
-            <small>Todo el contenido se mueve a la izquierda o a la derecha sin cambiar de tamaño (100 %).</small>
+            <strong>Márgenes independientes</strong>
+            <small>Cada margen se ajusta por separado. El contenido se adapta con una escala proporcional (igual en ancho y alto): nunca deforma tablas ni códigos de barras.</small>
           </span>
         </label>
         <label class="radio">
-          <input type="radio" name="mode" value="fit">
+          <input type="radio" name="mode" value="shift">
           <span>
-            <strong>Fijar ambos márgenes</strong>
-            <small>Usa una escala proporcional (el mismo factor en ancho y alto), así que nunca deforma tablas ni códigos de barras.</small>
+            <strong>Mover el bloque (tamaño 100 %)</strong>
+            <small>El contenido conserva su tamaño exacto y solo se desplaza. Por eso, al aumentar un margen, el otro se reduce.</small>
           </span>
         </label>
-        <div id="vAnchorRow" class="field hidden">
+        <div id="vAnchorRow" class="field">
           <label for="vAnchor">Ancla vertical al escalar</label>
           <select id="vAnchor">
             <option value="top" selected>Mantener margen superior</option>
@@ -179,7 +179,7 @@
         <h2>Integridad del documento</h2>
         <ul>
           <li>El PDF <strong>no se convierte a imagen</strong>: textos, tablas y códigos de barras se conservan como el original.</li>
-          <li>En <strong>Solo desplazar</strong> el tamaño no cambia: solo se mueve el contenido.</li>
+          <li>El contenido nunca se estira en una sola dirección: si se ajusta, es en la misma proporción a lo ancho y a lo alto. En <strong>Mover el bloque</strong> el tamaño no cambia.</li>
           <li>Se conservan también los enlaces, campos de formulario, fuentes y metadatos.</li>
           <li>Si algún contenido fuera a quedar fuera de la hoja, la descarga se bloquea y se avisa en qué página.</li>
         </ul>
