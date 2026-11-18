@@ -253,13 +253,19 @@ input[type="range"] { width: 100%; margin-top: 10px; accent-color: var(--primary
 
 /* ---------- Pie ---------- */
 .app-footer {
+  position: sticky;   /* siempre visible al fondo de la pantalla */
+  bottom: 0;
+  z-index: 40;
+  flex-shrink: 0;
   text-align: center;
-  padding: 10px;
-  font-size: 13px;
-  color: #c9d4ea;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #dfe6f5;
   background: var(--header);
+  border-top: 3px solid var(--primary);
+  box-shadow: 0 -2px 10px rgba(20, 33, 61, .18);
 }
-.app-footer strong { color: #fff; }
+.app-footer strong { color: #fff; letter-spacing: .01em; }
 
 /* ---------- Superposición y avisos ---------- */
 .overlay {
@@ -283,7 +289,7 @@ input[type="range"] { width: 100%; margin-top: 10px; accent-color: var(--primary
 #progressBar { height: 100%; width: 0; background: var(--primary); transition: width .15s; }
 
 .toast {
-  position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);
+  position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
   background: #1c2430; color: #fff;
   padding: 10px 16px; border-radius: 8px;
   box-shadow: 0 6px 24px rgba(0,0,0,.25);
@@ -292,6 +298,14 @@ input[type="range"] { width: 100%; margin-top: 10px; accent-color: var(--primary
 .toast.error { background: var(--err); }
 
 /* ---------- Adaptable ---------- */
+@media (max-width: 1180px), (max-height: 720px) {
+  /* La página crece y se desplaza normalmente; nada queda oculto */
+  html, body { height: auto; }
+  body { min-height: 100vh; }
+  .layout { flex: none; }
+  .panel { overflow: visible; }
+  .canvas-wrap { min-height: 75vh; }
+}
 @media (max-width: 1180px) {
   .layout { grid-template-columns: 290px minmax(0, 1fr); }
   .layout > .panel:last-child { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
