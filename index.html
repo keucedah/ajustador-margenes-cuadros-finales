@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajustador de Márgenes PDF</title>
+  <meta name="description" content="Ajuste los márgenes laterales de un PDF sin perder ni distorsionar texto, tablas ni códigos de barras.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 2h9l5 5v15H6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M15 2v5h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M3 13h5M5.5 11 3 13l2.5 2M21 13h-5m2.5-2 2.5 2-2.5 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <h1>Ajustador de Márgenes PDF</h1>
+        <p>Ajuste los márgenes laterales sin perder ni distorsionar el contenido</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span id="fileName" class="file-name"></span>
+      <label class="btn btn-secondary" for="fileInput">Abrir PDF</label>
+      <input type="file" id="fileInput" accept="application/pdf,.pdf" hidden>
+      <button id="btnExport" class="btn btn-primary" disabled>Descargar PDF ajustado</button>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <!-- ===== Panel de controles ===== -->
+    <aside class="panel">
+      <section class="card">
+        <h2>Márgenes laterales</h2>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="unit">Unidad</label>
+            <select id="unit">
+              <option value="mm" selected>Milímetros (mm)</option>
+              <option value="cm">Centímetros (cm)</option>
+              <option value="in">Pulgadas (in)</option>
+              <option value="pt">Puntos (pt)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="step">Paso de botones</label>
+            <select id="step"></select>
+          </div>
+        </div>
+
+        <div class="margin-control">
+          <div class="mc-head">
+            <span class="mc-label"><span class="dot dot-left"></span>Margen izquierdo</span>
+            <span class="mc-orig" id="leftOrig">—</span>
+          </div>
+          <div class="mc-row">
+            <button class="step-btn" data-side="left" data-dir="-1" aria-label="Reducir margen izquierdo" disabled>−</button>
+            <div class="num-wrap">
+              <input type="number" id="leftInput" step="any" min="0" disabled>
+              <span class="unit-tag">mm</span>
+            </div>
+            <button class="step-btn" data-side="left" data-dir="1" aria-label="Aumentar margen izquierdo" disabled>+</button>
+          </div>
+          <input type="range" id="leftRange" min="0" max="100" step="0.1" disabled>
+        </div>
+
+        <div class="margin-control">
+          <div class="mc-head">
+            <span class="mc-label"><span class="dot dot-right"></span>Margen derecho</span>
+            <span class="mc-orig" id="rightOrig">—</span>
+          </div>
+          <div class="mc-row">
+            <button class="step-btn" data-side="right" data-dir="-1" aria-label="Reducir margen derecho" disabled>−</button>
+            <div class="num-wrap">
+              <input type="number" id="rightInput" step="any" min="0" disabled>
+              <span class="unit-tag">mm</span>
+            </div>
+            <button class="step-btn" data-side="right" data-dir="1" aria-label="Aumentar margen derecho" disabled>+</button>
+          </div>
+          <input type="range" id="rightRange" min="0" max="100" step="0.1" disabled>
+        </div>
+
+        <p class="hint" id="linkHint">En modo <strong>Solo desplazar</strong> los dos márgenes están enlazados: si uno crece, el otro se reduce, porque el contenido conserva su tamaño exacto.</p>
+
+        <div class="quick-actions">
+          <button id="btnCenter" class="btn btn-ghost" disabled>Centrar contenido</button>
+          <button id="btnReset" class="btn btn-ghost" disabled>Restablecer</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Modo de ajuste</h2>
+        <label class="radio">
+          <input type="radio" name="mode" value="shift" checked>
+          <span>
+            <strong>Solo desplazar (recomendado)</strong>
+            <small>Todo el contenido se mueve a la izquierda o a la derecha sin cambiar de tamaño (100 %).</small>
+          </span>
+        </label>
+        <label class="radio">
+          <input type="radio" name="mode" value="fit">
+          <span>
+            <strong>Fijar ambos márgenes</strong>
+            <small>Usa una escala proporcional (el mismo factor en ancho y alto), así que nunca deforma tablas ni códigos de barras.</small>
+          </span>
+        </label>
+        <div id="vAnchorRow" class="field hidden">
+          <label for="vAnchor">Ancla vertical al escalar</label>
+          <select id="vAnchor">
+            <option value="top" selected>Mantener margen superior</option>
+            <option value="center">Mantener centrado vertical</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Opciones</h2>
+        <div class="field">
+          <label for="reference">Aplicar a las páginas</label>
+          <select id="reference">
+            <option value="common" selected>Igual en todo el documento</option>
+            <option value="page">Según el contenido de cada página</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="threshold">Sensibilidad de detección del contenido: <output id="thresholdOut">240</output></label>
+          <input type="range" id="threshold" min="180" max="254" step="1" value="240">
+          <small class="hint">Súbala si hay elementos muy claros (marcas de agua o grises suaves) que deben contarse como contenido.</small>
+        </div>
+      </section>
+    </aside>
+
+    <!-- ===== Visor ===== -->
+    <section class="viewer">
+      <div class="toolbar">
+        <div class="pager">
+          <button id="prevPage" class="icon-btn" aria-label="Página anterior" disabled>‹</button>
+          <span>Página <input type="number" id="pageInput" min="1" value="1" disabled> de <span id="pageCount">0</span></span>
+          <button id="nextPage" class="icon-btn" aria-label="Página siguiente" disabled>›</button>
+        </div>
+        <div class="toolbar-right">
+          <select id="zoom" aria-label="Zoom">
+            <option value="fit" selected>Página completa</option>
+            <option value="width">Ajustar al ancho</option>
+          </select>
+          <button id="btnCompare" class="btn btn-ghost" disabled>Ver original</button>
+        </div>
+      </div>
+
+      <div class="canvas-wrap" id="canvasWrap">
+        <div class="dropzone" id="dropzone">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <p><strong>Arrastre aquí su PDF</strong></p>
+          <p>o use el botón <em>Abrir PDF</em></p>
+          <small>El archivo se procesa en su navegador y no se sube a ningún servidor.</small>
+        </div>
+        <canvas id="previewCanvas" hidden></canvas>
+        <div class="badge-original hidden" id="badgeOriginal">VISTA ORIGINAL</div>
+      </div>
+    </section>
+
+    <!-- ===== Métricas ===== -->
+    <aside class="panel">
+      <section class="card">
+        <h2>Métricas</h2>
+        <dl class="metrics" id="metrics">
+          <div><dt>Documento</dt><dd>—</dd></div>
+        </dl>
+      </section>
+      <section class="card">
+        <h2>Estado</h2>
+        <div id="status" class="status status-idle">Cargue un PDF para comenzar.</div>
+      </section>
+      <section class="card info">
+        <h2>Integridad del documento</h2>
+        <ul>
+          <li>El PDF <strong>no se convierte a imagen</strong>: textos, tablas y códigos de barras se conservan como el original.</li>
+          <li>En <strong>Solo desplazar</strong> el tamaño no cambia: solo se mueve el contenido.</li>
+          <li>Se conservan también los enlaces, campos de formulario, fuentes y metadatos.</li>
+          <li>Si algún contenido fuera a quedar fuera de la hoja, la descarga se bloquea y se avisa en qué página.</li>
+        </ul>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="app-footer">
+    Desarrollado por <strong>Prof Kenfor Euceda</strong>
+  </footer>
+
+  <div id="overlay" class="overlay hidden" role="status" aria-live="polite">
+    <div class="overlay-box">
+      <div class="spinner"></div>
+      <p id="overlayText">Analizando…</p>
+      <div class="progress"><div id="progressBar"></div></div>
+    </div>
+  </div>
+  <div id="toast" class="toast hidden" role="alert"></div>
+
+  <!-- Librerías -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+  <!-- Aplicación -->
+  <script src="js/utils.js"></script>
+  <script src="js/analyzer.js"></script>
+  <script src="js/margin-engine.js"></script>
+  <script src="js/preview.js"></script>
+  <script src="js/exporter.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
